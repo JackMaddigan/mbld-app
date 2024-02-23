@@ -80,3 +80,9 @@ position: absolute;
 .photo-button:active .circle {
     opacity: 0.5;
 }
+
+#switchCameraBtn{
+    position: absolute;
+    top:0;
+    left:0;
+}
