@@ -1,20 +1,44 @@
 const video = document.getElementById("video");
-
-// Prompt the user for permission to access the camera
-navigator.mediaDevices
-  .getUserMedia({ video: true })
-  .then((stream) => {
-    video.srcObject = stream;
-  })
-  .catch((error) => {
-    console.error("Error accessing the camera:", error);
-  });
-
 const captureBtn = document.getElementById("captureBtn");
+const switchCameraBtn = document.getElementById("switchCameraBtn");
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
 
-photoButton.addEventListener("click", () => {
+let currentFacingMode = "user"; // 'user' for front camera, 'environment' for rear camera
+
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: currentFacingMode },
+    });
+
+    video.srcObject = stream;
+  } catch (error) {
+    console.error("Error accessing the camera:", error);
+  }
+}
+
+startCamera(); // Initialize the camera with the default facing mode
+
+function switchCamera() {
+  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+  restartCamera();
+}
+
+async function restartCamera() {
+  const stream = video.srcObject;
+  const tracks = stream.getTracks();
+
+  // Stop all tracks
+  tracks.forEach((track) => track.stop());
+
+  // Start the camera with the updated facing mode
+  await startCamera();
+}
+
+switchCameraBtn.addEventListener("click", switchCamera);
+
+photoBtn.addEventListener("click", () => {
   // Draw the current video frame onto the canvas
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
